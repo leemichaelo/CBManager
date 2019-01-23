@@ -133,7 +133,17 @@ namespace ComicBookLibraryManager.Data
         /// <param name="comicBook">The ComicBook entity instance to add.</param>
         public static void AddComicBook(ComicBook comicBook)
         {
-            // TODO
+            using (Context context = GetContext())
+            {
+                context.ComicBooks.Add(comicBook);
+
+                if(comicBook.Series?.Id > 0)
+                {
+                    context.Entry(comicBook.Series).State = EntityState.Unchanged;
+                }
+
+                context.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -142,7 +152,15 @@ namespace ComicBookLibraryManager.Data
         /// <param name="comicBook">The ComicBook entity instance to update.</param>
         public static void UpdateComicBook(ComicBook comicBook)
         {
-            // TODO
+            using (Context context = GetContext())
+            {
+                context.ComicBooks.Attach(comicBook);
+                var comicBookEntry = context.Entry(comicBook);
+                comicBookEntry.State = EntityState.Modified;
+                //comicBookEntry.Property("IssueNumber").IsModified = false;
+
+                context.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -151,7 +169,13 @@ namespace ComicBookLibraryManager.Data
         /// <param name="comicBookId">The comic book ID to delete.</param>
         public static void DeleteComicBook(int comicBookId)
         {
-            // TODO
+            using (Context context = GetContext())
+            {
+                var comicBook = new ComicBook() { Id = comicBookId };
+                context.Entry(comicBook).State = EntityState.Deleted;
+
+                context.SaveChanges();
+            }
         }
     }
 }
